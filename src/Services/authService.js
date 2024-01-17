@@ -33,7 +33,7 @@ const sendResetTokenByEmail = async (email, resetToken) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Password Reset",
-      text: `Here is your password reset token: ${resetToken}\n\nPlease copy this token and use it in the password reset form on our website.`,
+      text: `Here is your password reset Password: ${resetToken}\n\nPlease copy this token and use it in the password reset form on our website.`,
     };
 
     await transporter.sendMail(mailOptions);
@@ -41,6 +41,7 @@ const sendResetTokenByEmail = async (email, resetToken) => {
     console.error("Error sending email:", error);
   }
 };
+
 
 module.exports = {
   generateResetToken,

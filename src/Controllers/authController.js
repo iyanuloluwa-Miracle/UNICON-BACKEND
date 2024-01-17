@@ -7,11 +7,28 @@ const {
   generateResetToken,
   validateResetToken,
 } = require("../Services/authService");
+const {
+  userRegistrationSchema,
+  userLoginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} = require('../Validators/validation');
 
 // Controller for user sign-up
 const signupUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { error, value } = userRegistrationSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: error.details[0].message,
+        message: 'User registration failed',
+      });
+    }
+
+    const { username, email, password } = value;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -19,7 +36,7 @@ const signupUser = async (req, res) => {
       return res.status(400).json({
         success: false,
         data: null,
-        message: "User already exists",
+        message: 'User already exists',
       });
     }
 
@@ -28,6 +45,7 @@ const signupUser = async (req, res) => {
 
     // Create a new user
     const user = new User({
+      username,
       email,
       password: hashedPassword,
     });
@@ -38,7 +56,7 @@ const signupUser = async (req, res) => {
     res.status(201).json({
       success: true,
       data: user,
-      message: "User registration successful",
+      message: 'User registration successful',
     });
   } catch (err) {
     console.error(err);
@@ -46,15 +64,24 @@ const signupUser = async (req, res) => {
       success: false,
       data: null,
       error: err.message,
-      message: "User registration failed",
+      message: 'User registration failed',
     });
   }
 };
-
-// Controller for user sign-in
 const signInUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { error, value } = userLoginSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: error.details[0].message,
+        message: 'Login failed',
+      });
+    }
+
+    const { email, password } = value;
 
     // Find the user by email
     const user = await User.findOne({ email });
@@ -76,7 +103,7 @@ const signInUser = async (req, res) => {
       success: true,
       data: { user, accessToken },
       error: null,
-      message: "Login Successful",
+      message: 'Login Successful',
     });
   } catch (err) {
     res.status(400).json({
@@ -92,12 +119,12 @@ const signInUser = async (req, res) => {
 const logoutUser = (req, res) => {
   try {
     // Clear the token cookie
-    res.clearCookie("token");
+    res.clearCookie('token');
 
     res.status(200).json({
       success: true,
       data: null,
-      message: "Logged out successfully!",
+      message: 'Logged out successfully!',
     });
   } catch (err) {
     res.status(400).json({
@@ -109,13 +136,25 @@ const logoutUser = (req, res) => {
   }
 };
 
+// Controller for forgot password
 const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { error, value } = forgotPasswordSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: error.details[0].message,
+        message: 'Password reset email failed',
+      });
+    }
+
+    const { email } = value;
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res.status(404).json({ success: false, error: 'User not found' });
     }
 
     // Generate a reset token and save its hash in the user document
@@ -131,29 +170,39 @@ const forgotPassword = async (req, res) => {
     res.status(200).json({
       success: true,
       data: { email: user.email },
-      message: "Password reset email sent",
+      message: 'Password reset email sent',
     });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
 };
 
-
-
+// Controller for reset password
 const resetPassword = async (req, res) => {
   try {
-    const { email, resetToken, newPassword } = req.body;
+    const { error, value } = resetPasswordSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: error.details[0].message,
+        message: 'Password reset failed',
+      });
+    }
+
+    const { email, resetToken, newPassword } = value;
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res.status(404).json({ success: false, error: 'User not found' });
     }
 
     // Validate the reset token
     if (!validateResetToken(user.resetTokenHash, resetToken)) {
       return res
         .status(400)
-        .json({ success: false, error: "Invalid or expired reset token" });
+        .json({ success: false, error: 'Invalid or expired reset token' });
     }
 
     // Reset the user's password
@@ -167,7 +216,7 @@ const resetPassword = async (req, res) => {
     res.status(200).json({
       success: true,
       data: { email: user.email },
-      message: "Password reset successful",
+      message: 'Password reset successful',
     });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
