@@ -5,7 +5,7 @@ const Event = require('../Models/events');
 // Create a new event
 const createEvent = async (req, res) => {
   try {
-    const eventData = { ...req.body, creator: req.user.userId }; // Assuming userId is stored in req.user
+    const eventData = { ...req.body, creator: req.user.userId }; // userId is stored in req.user
 
     // Create a new event
     const event = new Event(eventData);
@@ -151,11 +151,56 @@ const getEventById = async (req, res) => {
     }
 };
 
+const searchAndFilterEvents = async (req, res) => {
+  try {
+    // Extract parameters from query
+    const { search, location, date } = req.query;
+
+    // Create a filter object based on provided parameters
+    const filters = {};
+    if (location) filters.location = location;
+    if (date) filters.startDate = { $gte: new Date(date) };
+
+    // Build the main query
+    let mainQuery = {};
+    if (search) {
+      mainQuery = {
+        $or: [
+          { name: { $regex: new RegExp(search, 'i') } },
+          { description: { $regex: new RegExp(search, 'i') } },
+        ],
+      };
+    }
+
+    // Combine the main query and filters
+    const finalQuery = { ...mainQuery, ...filters };
+
+    // Fetch events from the database based on the combined query
+    const events = await Event.find(finalQuery).populate('creator', 'username email');
+
+    res.status(200).json({
+      success: true,
+      data: events,
+      message: 'Search and filter results retrieved successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      data: null,
+      error: err.message,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+
 module.exports = {
     createEvent,
     getAllEvents,
     getEventById,
     updateEventById,
     deleteEventById,
+    searchAndFilterEvents 
 };
   

@@ -19,5 +19,9 @@ router.put('/events/:id', verifyToken, validateEvent, eventController.updateEven
 // Delete a specific event by ID
 router.delete('/events/:id', verifyToken, eventController.deleteEventById);
 
+// Search and filter events
+router.get('/events/search-filter', verifyToken, eventController.searchAndFilterEvents);
+
+
 
 module.exports = router;
