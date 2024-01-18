@@ -15,4 +15,5 @@ mongoose
 
 //Models
 require("./users");
+require("./events");
 

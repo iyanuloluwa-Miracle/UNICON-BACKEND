@@ -21,6 +21,7 @@ app.get("/", async (req, res, next) => {
 });
 
 app.use("/api/v1/", require("./src/Routes/auth.route"));
+app.use("/api/v1/", require("./src/Routes/event.route"));
 
 // Middleware to generate 404 error for undefined routes
 app.use(notFoundHandler);
