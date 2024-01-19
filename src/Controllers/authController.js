@@ -35,9 +35,7 @@ const signupUser = async (req, res) => {
     }
 
     const { username, email, password } = value;
-    const profilePicture = `https://api.dicebear.com/7.x/micah/svg?seed=${
-      username
-    }`;
+    const profilePicture = `https://api.dicebear.com/7.x/micah/svg?seed=${username}`;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -57,7 +55,7 @@ const signupUser = async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      profilePicture
+      profilePicture,
     });
 
     const emailToken = generateLongToken();
@@ -190,13 +188,17 @@ const signInUser = async (req, res) => {
     const combinedToken = `${refreshToken}`;
 
     // Set a single cookie with the combined token
-    res.cookie("authToken", combinedToken, {
+
+    res.cookie("authToken", refreshToken, {
       httpOnly: true,
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      secure: true,
+      sameSite: "none",
+      maxAge: 604800000,
+      path: "/",
     });
 
     // Send both tokens in the response
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         user,
@@ -223,7 +225,7 @@ const logoutUser = async (req, res) => {
     const refreshToken = req.headers.authorization?.split(" ")[1];
 
     // Invalidate or clear the access token
-    invalidateAccessToken(refreshToken );
+    invalidateAccessToken(refreshToken);
 
     res.status(200).json({
       success: true,

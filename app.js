@@ -6,6 +6,7 @@ const {
 const morgan = require("morgan");
 require("dotenv").config();
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const corsOptions = {
   origin: (origin, callback) => {
@@ -34,6 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 app.use(cors(corsOptions));
+app.use(cookieParser());
 
 app.get("/", async (req, res, next) => {
   res.send({ message: "Welcome to Squado 🐻" });
