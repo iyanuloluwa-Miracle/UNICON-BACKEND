@@ -21,7 +21,7 @@ const registerEventSchema = Joi.object({
   email: Joi.string().email().required(),
   amount: Joi.number().required(),
   initiateType: Joi.string().default("inline"),
-  currency: Joi.string().required().valid("NGN",),
+  currency: Joi.string().required().valid("NGN"),
   callbackUrl: Joi.string().required(),
 });
 
@@ -34,7 +34,7 @@ module.exports = {
         success: false,
         error: {
           message: "Validation Error",
-          details: error.details.map((detail) => detail.message),
+          details: error.details[0].message,
         },
         data: null,
       });

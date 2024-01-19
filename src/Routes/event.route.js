@@ -9,8 +9,7 @@ const { validateEvent } = require("../Validators/events");
 router.post("/events", verifyToken, validateEvent, eventController.createEvent);
 
 // User's who don't have an account can also register for events.
-router.post("/events/register", validateEvent, eventController.register);
-
+router.post("/events/register", eventController.register);
 
 // Get all events
 router.get("/events", verifyToken, eventController.getAllEvents);

@@ -216,8 +216,10 @@ const register = async (req, res) => {
         message: error.details[0].message,
       });
 
+    
     const { customerName, email, amount, initiateType, currency, callbackUrl } =
       value;
+  
     const dataToSend = {
       email,
       amount,
