@@ -100,6 +100,7 @@ const signInUser = async (req, res) => {
 
     // Generate the access token and refresh token
     const accessToken = generateAccessToken(user);
+
     const refreshToken = generateRefreshToken();
     // Store the refresh token in the user document
     user.refreshToken = refreshToken;
@@ -117,7 +118,11 @@ const signInUser = async (req, res) => {
     // Send both tokens in the response
     res.status(200).json({
       success: true,
-      data: { user, accessToken },
+      data: {
+        user,
+        accessToken,
+        refreshToken,
+      },
       error: null,
       message: "Login Successful",
     });
@@ -139,6 +144,7 @@ const logoutUser = async (req, res) => {
 
     // Invalidate or clear the access token
     invalidateAccessToken(accessToken);
+
 
     res.status(200).json({
       success: true,
