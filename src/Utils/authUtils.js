@@ -1,5 +1,4 @@
 // authUtils.js
-
 const jwt = require('jsonwebtoken');
 
 const generateAccessToken = (user) => {
@@ -18,24 +17,6 @@ const generateAccessToken = (user) => {
 
   return token;
 };
-
-
-const generateRefreshToken = (user) => {
-  const payload = {
-    userId: user._id,
-    name: user.name,
-  };
-
-  const options = {
-    expiresIn: '7d'
-  }
-
-   const token = jwt.sign(payload, process.env.JWT_SECRET, options);
-
-   console.log("Generated Refresh Token:", token);
-
-   return token;
-}
 
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -59,4 +40,14 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = { verifyToken, generateAccessToken, generateRefreshToken };
+
+const generateRefreshToken = () => {
+  const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: '7d', // Set your desired expiration time
+  });
+
+  console.log('Generated Refresh Token:', refreshToken);
+
+  return refreshToken;
+};
+module.exports = { generateAccessToken, verifyToken,generateRefreshToken};

@@ -100,7 +100,20 @@ const signInUser = async (req, res) => {
 
     // Generate the access token and refresh token
     const accessToken = generateAccessToken(user);
-    const refreshToken = generqRefreshToken(user);
+
+    const refreshToken = generateRefreshToken();
+    // Store the refresh token in the user document
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Combine access and refresh tokens into a single cookie
+    const combinedToken = `${accessToken}.${refreshToken}`;
+
+    // Set a single cookie with the combined token
+    res.cookie("authToken", combinedToken, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
 
     // Send both tokens in the response
     res.status(200).json({
@@ -124,10 +137,14 @@ const signInUser = async (req, res) => {
 };
 
 // Controller for user logout
-const logoutUser = (req, res) => {
+const logoutUser = async (req, res) => {
   try {
-    // Clear the token cookie
-    res.clearCookie("token");
+    // Extract token from Authorization header
+    const accessToken = req.headers.authorization?.split(" ")[1];
+
+    // Invalidate or clear the access token
+    invalidateAccessToken(accessToken);
+
 
     res.status(200).json({
       success: true,
