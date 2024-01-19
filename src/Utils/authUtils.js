@@ -53,8 +53,8 @@ const verifyToken = (req, res, next) => {
 
 
 const generateRefreshToken = () => {
-  const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: '7d', // Set your desired expiration time
+  const refreshToken = jwt.sign({}, process.env.JWT_SECRET, {
+    expiresIn: "7d", // Set your desired expiration time
   });
 
   console.log('Generated Refresh Token:', refreshToken);
