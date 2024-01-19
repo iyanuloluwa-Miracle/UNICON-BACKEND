@@ -62,7 +62,7 @@ const signupUser = async (req, res) => {
     const link =
       process.env.NODE_ENV === "production"
         ? `https://unicorn-22up.onrender.com/api/v1/auth/verify-email?token=${emailToken}`
-        : `http://localhost:2800/api/v1/auth/verify-email`;
+        : `http://localhost:2800/api/v1/auth/verify-email?token=${emailToken}`;
 
     await user.save();
     await sendVerificationEmail(email, link, username);
