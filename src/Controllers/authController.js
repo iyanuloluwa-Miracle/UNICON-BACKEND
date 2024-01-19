@@ -1,7 +1,7 @@
 require("../Models/mongoose");
 const User = require("../Models/users");
 const argon2 = require("argon2");
-const { generateAccessToken } = require("../Utils/authUtils");
+const { generateAccessToken, revokeAccessToken } = require("../Utils/authUtils");
 const {
   sendResetTokenByEmail,
   generateResetToken,
@@ -116,10 +116,13 @@ const signInUser = async (req, res) => {
 };
 
 // Controller for user logout
-const logoutUser = (req, res) => {
+const logoutUser = async (req, res) => {
   try {
-    // Clear the token cookie
-    res.clearCookie('token');
+    // Extract token from Authorization header
+    const accessToken = req.headers.authorization?.split(' ')[1];
+
+    // Revoke the access token
+    await revokeAccessToken(accessToken);
 
     res.status(200).json({
       success: true,

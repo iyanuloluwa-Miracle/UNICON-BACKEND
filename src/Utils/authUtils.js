@@ -1,5 +1,4 @@
 // authUtils.js
-
 const jwt = require('jsonwebtoken');
 
 const generateAccessToken = (user) => {
@@ -41,4 +40,22 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = { verifyToken, generateAccessToken };
+const revokeAccessToken = async (accessToken) => {
+  try {
+    // Check if the token is already revoked
+    if (revokedTokens.includes(accessToken)) {
+      console.log(`Token already revoked: ${accessToken}`);
+      return;
+    }
+
+ 
+    revokedTokens.push(accessToken);
+
+    console.log(`Revoking access token: ${accessToken}`);
+    
+  } catch (error) {
+    throw new Error(`Error revoking access token: ${error.message}`);
+  }
+};
+
+module.exports = { generateAccessToken, verifyToken, revokeAccessToken };
