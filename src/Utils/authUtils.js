@@ -40,29 +40,13 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// authUtils.js
-const invalidateAccessToken = (accessToken) => {
-  // Replace this with your actual logic to invalidate or clear the token
-  console.log(`Invalidating access token: ${accessToken}`);
-  
+const generateRefreshToken = () => {
+  const refreshToken = jwt.sign({}, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: '7d', // Set your desired expiration time
+  });
+
+  console.log('Generated Refresh Token:', refreshToken);
+
+  return refreshToken;
 };
-
-// const revokeAccessToken = async (accessToken) => {
-//   try {
-//     // Check if the token is already revoked
-//     if (revokedTokens.includes(accessToken)) {
-//       console.log(`Token already revoked: ${accessToken}`);
-//       return;
-//     }
-
- 
-//     revokedTokens.push(accessToken);
-
-//     console.log(`Revoking access token: ${accessToken}`);
-    
-//   } catch (error) {
-//     throw new Error(`Error revoking access token: ${error.message}`);
-//   }
-// };
-
-module.exports = { generateAccessToken, verifyToken,invalidateAccessToken };
+module.exports = { generateAccessToken, verifyToken,generateRefreshToken};
