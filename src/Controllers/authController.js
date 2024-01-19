@@ -35,6 +35,9 @@ const signupUser = async (req, res) => {
     }
 
     const { username, email, password } = value;
+    const profilePicture = `https://api.dicebear.com/7.x/micah/svg?seed=${
+      username
+    }`;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -54,6 +57,7 @@ const signupUser = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      profilePicture
     });
 
     const emailToken = generateLongToken();
