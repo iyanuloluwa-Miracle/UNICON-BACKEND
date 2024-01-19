@@ -40,22 +40,29 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-const revokeAccessToken = async (accessToken) => {
-  try {
-    // Check if the token is already revoked
-    if (revokedTokens.includes(accessToken)) {
-      console.log(`Token already revoked: ${accessToken}`);
-      return;
-    }
-
- 
-    revokedTokens.push(accessToken);
-
-    console.log(`Revoking access token: ${accessToken}`);
-    
-  } catch (error) {
-    throw new Error(`Error revoking access token: ${error.message}`);
-  }
+// authUtils.js
+const invalidateAccessToken = (accessToken) => {
+  // Replace this with your actual logic to invalidate or clear the token
+  console.log(`Invalidating access token: ${accessToken}`);
+  
 };
 
-module.exports = { generateAccessToken, verifyToken, revokeAccessToken };
+// const revokeAccessToken = async (accessToken) => {
+//   try {
+//     // Check if the token is already revoked
+//     if (revokedTokens.includes(accessToken)) {
+//       console.log(`Token already revoked: ${accessToken}`);
+//       return;
+//     }
+
+ 
+//     revokedTokens.push(accessToken);
+
+//     console.log(`Revoking access token: ${accessToken}`);
+    
+//   } catch (error) {
+//     throw new Error(`Error revoking access token: ${error.message}`);
+//   }
+// };
+
+module.exports = { generateAccessToken, verifyToken,invalidateAccessToken };
