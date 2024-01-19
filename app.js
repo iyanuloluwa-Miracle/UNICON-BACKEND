@@ -5,6 +5,8 @@ const {
 } = require("./src/Middleware/errorHandler");
 const morgan = require("morgan");
 require("dotenv").config();
+const cors = require("cors");
+
 const corsOptions = {
   origin: (origin, callback) => {
     // Check if the origin matches any of the patterns
@@ -27,15 +29,11 @@ const allowedOriginPatterns = [
   /^https:\/\/getunicon\.vercel\.app/,
 ];
 
-
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
-
-
-
+app.use(cors(corsOptions));
 
 app.get("/", async (req, res, next) => {
   res.send({ message: "Welcome to Squado 🐻" });
