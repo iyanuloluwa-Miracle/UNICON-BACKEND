@@ -8,10 +8,11 @@ const crypto = require("crypto");
 // Create a new event
 const createEvent = async (req, res) => {
   try {
-    const eventData = { ...req.body, creator: req.user.userId }; // userId is stored in req.user
+    // userId is stored in req.user
 
     // Create a new event
-    const event = new Event(eventData);
+    console.log(req.body);
+    const event = new Event(req.body);
 
     // Save the event to the database
     await event.save();
@@ -216,15 +217,14 @@ const register = async (req, res) => {
         message: error.details[0].message,
       });
 
-    
     const { customerName, email, amount, initiateType, currency, callbackUrl } =
       value;
     // Multiply the amount by 100
     const amountInKobo = amount * 100;
-  
+
     const dataToSend = {
       email,
-      amount:amountInKobo,
+      amount: amountInKobo,
       initiate_type: initiateType,
       currency,
       customer_name: customerName,

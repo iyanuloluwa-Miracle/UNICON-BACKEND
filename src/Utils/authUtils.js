@@ -1,7 +1,7 @@
 // authUtils.js
-require("dotenv").config();
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
+require("dotenv").config();
 
 const generateAccessToken = (user) => {
   const payload = {
@@ -10,12 +10,12 @@ const generateAccessToken = (user) => {
   };
 
   const options = {
-    expiresIn: '50m',
+    expiresIn: "50m",
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, options);
 
-  console.log('Generated Token:', token);
+  console.log("Generated Token:", token);
 
   return token;
 };
@@ -31,15 +31,16 @@ const generateLongToken = () => {
   return longToken;
 };
 
-
 const verifyToken = (req, res, next) => {
+  console.log(req.cookies);
   const authToken = req.cookies.authToken;
 
-  if (!authToken) {
-    console.log('Invalid token: Token not found'); 
-    return res.status(401).json({ success: false, message: 'Invalid token' });
-  }
+  console.log(authToken);
 
+  if (!authToken) {
+    console.log("Invalid token: Token not found");
+    return res.status(401).json({ success: false, message: "Invalid token" });
+  }
 
   try {
     const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
@@ -47,18 +48,17 @@ const verifyToken = (req, res, next) => {
     req.user = decodedToken; 
     next(); 
   } catch (err) {
-    console.log('Invalid token: Verification failed'); 
-    return res.status(401).json({ success: false, message: 'Invalid token' });
+    console.log("Invalid token: Verification failed");
+    return res.status(401).json({ success: false, message: "Invalid token" });
   }
 };
-
 
 const generateRefreshToken = () => {
   const refreshToken = jwt.sign({}, process.env.JWT_SECRET, {
     expiresIn: "7d", // Set your desired expiration time
   });
 
-  console.log('Generated Refresh Token:', refreshToken);
+  console.log("Generated Refresh Token:", refreshToken);
 
   return refreshToken;
 };

@@ -14,6 +14,7 @@ const eventSchema = Joi.object({
   startTime: Joi.string().required(),
   endTime: Joi.string().required(),
   tags: Joi.array().items(Joi.string()),
+  creator: Joi.string().required(),
 });
 
 const registerEventSchema = Joi.object({
