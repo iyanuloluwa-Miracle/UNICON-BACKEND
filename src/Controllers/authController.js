@@ -67,10 +67,9 @@ const signupUser = async (req, res) => {
     await user.save();
     await sendVerificationEmail(email, link, username);
 
-    const dataToSend = { password, ...others };
     res.status(201).json({
       success: true,
-      data: others,
+      data: user,
       message:
         "User registration successful, please check your mail to verify your account",
     });
