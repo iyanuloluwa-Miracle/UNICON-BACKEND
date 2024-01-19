@@ -16,6 +16,15 @@ const eventSchema = Joi.object({
   tags: Joi.array().items(Joi.string()),
 });
 
+const registerEventSchema = Joi.object({
+  customerName: Joi.string().required(),
+  email: Joi.string().email().required(),
+  amount: Joi.number().required(),
+  initiateType: Joi.string().default("inline"),
+  currency: Joi.string().required().valid("NGN",),
+  callbackUrl: Joi.string().required(),
+});
+
 module.exports = {
   validateEvent: (req, res, next) => {
     const { error } = eventSchema.validate(req.body, { abortEarly: false });
@@ -33,4 +42,5 @@ module.exports = {
 
     next();
   },
+  registerEventSchema,
 };
