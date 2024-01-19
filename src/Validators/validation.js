@@ -1,5 +1,5 @@
 // validation.js
-const Joi = require('joi');
+const Joi = require("joi");
 
 // Joi schema for user registration
 const userRegistrationSchema = Joi.object({
@@ -26,9 +26,14 @@ const resetPasswordSchema = Joi.object({
   newPassword: Joi.string().required(),
 });
 
+const verifyEmailRequestSchema = Joi.object({
+  token: Joi.string().required(),
+});
+
 module.exports = {
   userRegistrationSchema,
   userLoginSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  verifyEmailRequestSchema,
 };

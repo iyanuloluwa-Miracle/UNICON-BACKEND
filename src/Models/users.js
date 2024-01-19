@@ -44,6 +44,12 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    verifyEmailToken: {
+      type: String,
+      required: false
+    },
+    
+
     verifyEmailTokenExpiry: {
       type: Date,
       default: null,

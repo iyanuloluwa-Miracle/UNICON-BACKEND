@@ -4,17 +4,20 @@ const argon2 = require("argon2");
 const {
   generateAccessToken,
   generateRefreshToken,
+  generateLongToken,
 } = require("../Utils/authUtils");
 const {
   sendResetTokenByEmail,
   generateResetToken,
   validateResetToken,
+  sendVerificationEmail,
 } = require("../Services/authService");
 const {
   userRegistrationSchema,
   userLoginSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  verifyEmailRequestSchema,
 } = require("../Validators/validation");
 
 // Controller for user sign-up
@@ -53,14 +56,25 @@ const signupUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    // Save the user to the database
+    const emailToken = generateLongToken();
+    user.verifyEmailToken = emailToken;
+    user.verifyEmailTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const link =
+      process.env.NODE_ENV === "production"
+        ? `https://unicorn-22up.onrender.com/api/v1/auth/verify-email?token=${emailToken}`
+        : `http://localhost:2800/api/v1/auth/verify-email?token=${emailToken}`;
+
     await user.save();
+    await sendVerificationEmail(email, link, username);
 
     res.status(201).json({
       success: true,
       data: user,
-      message: "User registration successful",
+      message:
+        "User registration successful, please check your mail to verify your account",
     });
+
+    //send the user a mail
   } catch (err) {
     console.error(err);
     res.status(400).json({
@@ -68,6 +82,59 @@ const signupUser = async (req, res) => {
       data: null,
       error: err.message,
       message: "User registration failed",
+    });
+  }
+};
+
+const verifyEmail = async (req, res) => {
+  try {
+    const { error, value } = verifyEmailRequestSchema.validate(req.query);
+
+    if (error)
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: error.details[0].message,
+        message: "Email verification failed",
+      });
+
+    const redirectURL =
+      process.env.NODE_ENV === "development"
+        ? `http://localhost:3000/auth/login`
+        : `https://useunicon.vercel.app/auth/login`;
+
+    const verifyEmailToken = value.token;
+
+    const user = await User.findOne({
+      verifyEmailToken,
+      verifyEmailTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .redirect(
+          redirectURL + "?success=false&message=Invalid or expired token!"
+        );
+    }
+
+    user.verifyEmailToken = undefined;
+    user.verifyEmailTokenExpiry = undefined;
+    user.isVerified = true;
+
+    await user.save();
+
+    return res
+      .status(200)
+      .redirect(
+        redirectURL + "?success=true&message=User Email verified successfully"
+      );
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      data: null,
+      error: err.message,
+      message: null,
     });
   }
 };
@@ -89,14 +156,23 @@ const signInUser = async (req, res) => {
     // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error("User not found");
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid credential", data: null });
     }
 
     // Compare the password using Argon2
     const isPasswordValid = await argon2.verify(user.password, password);
     if (!isPasswordValid) {
-      throw new Error("Invalid password");
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid credential", data: null });
     }
+
+    if (!user.isVerified)
+      return res
+        .status(400)
+        .json({ success: false, message: "You are not verified", data: null });
 
     // Generate the access token and refresh token
     const accessToken = generateAccessToken(user);
@@ -144,7 +220,6 @@ const logoutUser = async (req, res) => {
 
     // Invalidate or clear the access token
     invalidateAccessToken(accessToken);
-
 
     res.status(200).json({
       success: true,
@@ -248,12 +323,11 @@ const resetPassword = async (req, res) => {
   }
 };
 
-
-
 module.exports = {
   signupUser,
   signInUser,
   logoutUser,
   forgotPassword,
   resetPassword,
+  verifyEmail,
 };
