@@ -13,6 +13,7 @@ router.post("/auth/login", userController.signInUser);
 router.post("/auth/logout", userController.logoutUser);
 router.post('/auth/forgot-password', userController.forgotPassword);
 router.post('/auth/reset-password', userController.resetPassword);
+router.get("/auth/verify-email", userController.verifyEmail);
 
 
 

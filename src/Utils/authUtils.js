@@ -1,5 +1,6 @@
 // authUtils.js
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require("uuid");
 
 const generateAccessToken = (user) => {
   const payload = {
@@ -17,6 +18,18 @@ const generateAccessToken = (user) => {
 
   return token;
 };
+
+const generateLongToken = () => {
+  const uuid = uuidv4();
+
+  // more randomness to make the token longer
+  const extraRandomData = Math.random().toString(36).substring(2);
+
+  const longToken = uuid + extraRandomData;
+
+  return longToken;
+};
+
 
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -50,4 +63,9 @@ const generateRefreshToken = () => {
 
   return refreshToken;
 };
-module.exports = { generateAccessToken, verifyToken,generateRefreshToken};
+module.exports = {
+  generateAccessToken,
+  verifyToken,
+  generateRefreshToken,
+  generateLongToken,
+};
