@@ -219,10 +219,12 @@ const register = async (req, res) => {
     
     const { customerName, email, amount, initiateType, currency, callbackUrl } =
       value;
+    // Multiply the amount by 100
+    const amountInKobo = amount * 100;
   
     const dataToSend = {
       email,
-      amount,
+      amount:amountInKobo,
       initiate_type: initiateType,
       currency,
       customer_name: customerName,
