@@ -1,8 +1,9 @@
-const Joi = require('joi');
+const Joi = require("joi");
 
 const eventSchema = Joi.object({
   name: Joi.string().required(),
   image: Joi.string().uri().required(),
+  eventType: Joi.string().valid("virtual", "physical").required(),
   description: Joi.string().required(),
   location: Joi.string().required(),
   ticketPrice: Joi.number().required(),
@@ -23,7 +24,7 @@ module.exports = {
       return res.status(400).json({
         success: false,
         error: {
-          message: 'Validation Error',
+          message: "Validation Error",
           details: error.details.map((detail) => detail.message),
         },
         data: null,

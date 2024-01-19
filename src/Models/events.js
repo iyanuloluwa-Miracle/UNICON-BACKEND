@@ -1,5 +1,5 @@
 // models/event.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema({
   name: {
@@ -8,6 +8,11 @@ const eventSchema = new mongoose.Schema({
   },
   image: {
     type: String,
+    required: true,
+  },
+  eventType: {
+    type: String,
+    enum: ["virtual", "physical"],
     required: true,
   },
   description: {
@@ -52,11 +57,11 @@ const eventSchema = new mongoose.Schema({
   },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
 });
 
-const Event = mongoose.model('Event', eventSchema);
+const Event = mongoose.model("Event", eventSchema);
 
 module.exports = Event;
