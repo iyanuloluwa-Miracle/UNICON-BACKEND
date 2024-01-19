@@ -4,7 +4,7 @@ const userController = require("../Controllers/authController");
 
 
 router.get("/", async (req, res, next) => {
-  res.send({ message: "Squado api is working 🚀" });
+  res.send({ message: "Squadco api is working 🚀" });
 });
 
 // Define user routes

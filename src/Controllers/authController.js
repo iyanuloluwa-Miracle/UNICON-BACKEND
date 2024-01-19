@@ -1,7 +1,10 @@
 require("../Models/mongoose");
 const User = require("../Models/users");
 const argon2 = require("argon2");
-const { generateAccessToken } = require("../Utils/authUtils");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../Utils/authUtils");
 const {
   sendResetTokenByEmail,
   generateResetToken,
@@ -12,7 +15,7 @@ const {
   userLoginSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
-} = require('../Validators/validation');
+} = require("../Validators/validation");
 
 // Controller for user sign-up
 const signupUser = async (req, res) => {
@@ -24,7 +27,7 @@ const signupUser = async (req, res) => {
         success: false,
         data: null,
         error: error.details[0].message,
-        message: 'User registration failed',
+        message: "User registration failed",
       });
     }
 
@@ -36,7 +39,7 @@ const signupUser = async (req, res) => {
       return res.status(400).json({
         success: false,
         data: null,
-        message: 'User already exists',
+        message: "User already exists",
       });
     }
 
@@ -56,7 +59,7 @@ const signupUser = async (req, res) => {
     res.status(201).json({
       success: true,
       data: user,
-      message: 'User registration successful',
+      message: "User registration successful",
     });
   } catch (err) {
     console.error(err);
@@ -64,7 +67,7 @@ const signupUser = async (req, res) => {
       success: false,
       data: null,
       error: err.message,
-      message: 'User registration failed',
+      message: "User registration failed",
     });
   }
 };
@@ -77,7 +80,7 @@ const signInUser = async (req, res) => {
         success: false,
         data: null,
         error: error.details[0].message,
-        message: 'Login failed',
+        message: "Login failed",
       });
     }
 
@@ -86,24 +89,29 @@ const signInUser = async (req, res) => {
     // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     // Compare the password using Argon2
     const isPasswordValid = await argon2.verify(user.password, password);
     if (!isPasswordValid) {
-      throw new Error('Invalid password');
+      throw new Error("Invalid password");
     }
 
     // Generate the access token and refresh token
     const accessToken = generateAccessToken(user);
+    const refreshToken = generqRefreshToken(user);
 
     // Send both tokens in the response
     res.status(200).json({
       success: true,
-      data: { user, accessToken },
+      data: {
+        user,
+        accessToken,
+        refreshToken,
+      },
       error: null,
-      message: 'Login Successful',
+      message: "Login Successful",
     });
   } catch (err) {
     res.status(400).json({
@@ -119,12 +127,12 @@ const signInUser = async (req, res) => {
 const logoutUser = (req, res) => {
   try {
     // Clear the token cookie
-    res.clearCookie('token');
+    res.clearCookie("token");
 
     res.status(200).json({
       success: true,
       data: null,
-      message: 'Logged out successfully!',
+      message: "Logged out successfully!",
     });
   } catch (err) {
     res.status(400).json({
@@ -146,7 +154,7 @@ const forgotPassword = async (req, res) => {
         success: false,
         data: null,
         error: error.details[0].message,
-        message: 'Password reset email failed',
+        message: "Password reset email failed",
       });
     }
 
@@ -154,7 +162,7 @@ const forgotPassword = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ success: false, error: 'User not found' });
+      return res.status(404).json({ success: false, error: "User not found" });
     }
 
     // Generate a reset token and save its hash in the user document
@@ -170,7 +178,7 @@ const forgotPassword = async (req, res) => {
     res.status(200).json({
       success: true,
       data: { email: user.email },
-      message: 'Password reset email sent',
+      message: "Password reset email sent",
     });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
@@ -187,7 +195,7 @@ const resetPassword = async (req, res) => {
         success: false,
         data: null,
         error: error.details[0].message,
-        message: 'Password reset failed',
+        message: "Password reset failed",
       });
     }
 
@@ -195,14 +203,14 @@ const resetPassword = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ success: false, error: 'User not found' });
+      return res.status(404).json({ success: false, error: "User not found" });
     }
 
     // Validate the reset token
     if (!validateResetToken(user.resetTokenHash, resetToken)) {
       return res
         .status(400)
-        .json({ success: false, error: 'Invalid or expired reset token' });
+        .json({ success: false, error: "Invalid or expired reset token" });
     }
 
     // Reset the user's password
@@ -216,15 +224,12 @@ const resetPassword = async (req, res) => {
     res.status(200).json({
       success: true,
       data: { email: user.email },
-      message: 'Password reset successful',
+      message: "Password reset successful",
     });
   } catch (err) {
     res.status(400).json({ success: false, error: err.message });
   }
 };
-
-
-
 
 module.exports = {
   signupUser,
