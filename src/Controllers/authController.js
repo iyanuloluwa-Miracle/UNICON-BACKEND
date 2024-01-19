@@ -2,7 +2,7 @@ require("../Models/mongoose");
 const User = require("../Models/users");
 const argon2 = require("argon2");
 const {
-  generateAccessToken,
+  // generateAccessToken,
   generateRefreshToken,
   generateLongToken,
 } = require("../Utils/authUtils");
@@ -175,7 +175,7 @@ const signInUser = async (req, res) => {
         .json({ success: false, message: "You are not verified", data: null });
 
     // Generate the access token and refresh token
-    const accessToken = generateAccessToken(user);
+    //const accessToken = generateAccessToken(user);
 
     const refreshToken = generateRefreshToken();
     // Store the refresh token in the user document
@@ -183,7 +183,7 @@ const signInUser = async (req, res) => {
     await user.save();
 
     // Combine access and refresh tokens into a single cookie
-    const combinedToken = `${accessToken}.${refreshToken}`;
+    const combinedToken = `${refreshToken}`;
 
     // Set a single cookie with the combined token
     res.cookie("authToken", combinedToken, {
@@ -196,7 +196,7 @@ const signInUser = async (req, res) => {
       success: true,
       data: {
         user,
-        accessToken,
+        // accessToken,
         refreshToken,
       },
       error: null,
@@ -216,10 +216,10 @@ const signInUser = async (req, res) => {
 const logoutUser = async (req, res) => {
   try {
     // Extract token from Authorization header
-    const accessToken = req.headers.authorization?.split(" ")[1];
+    const refreshToken = req.headers.authorization?.split(" ")[1];
 
     // Invalidate or clear the access token
-    invalidateAccessToken(accessToken);
+    invalidateAccessToken(refreshToken );
 
     res.status(200).json({
       success: true,

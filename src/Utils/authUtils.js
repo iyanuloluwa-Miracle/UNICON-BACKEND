@@ -32,15 +32,13 @@ const generateLongToken = () => {
 
 
 const verifyToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  console.log('Auth Header:', authHeader); 
+  const authToken = req.cookies.authToken;
 
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
+  if (!authToken) {
     console.log('Invalid token: Token not found'); 
     return res.status(401).json({ success: false, message: 'Invalid token' });
   }
+
 
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
