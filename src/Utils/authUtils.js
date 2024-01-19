@@ -19,6 +19,24 @@ const generateAccessToken = (user) => {
   return token;
 };
 
+
+const generateRefreshToken = (user) => {
+  const payload = {
+    userId: user._id,
+    name: user.name,
+  };
+
+  const options = {
+    expiresIn: '7d'
+  }
+
+   const token = jwt.sign(payload, process.env.JWT_SECRET, options);
+
+   console.log("Generated Refresh Token:", token);
+
+   return token;
+}
+
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   console.log('Auth Header:', authHeader); 
@@ -41,4 +59,4 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = { verifyToken, generateAccessToken };
+module.exports = { verifyToken, generateAccessToken, generateRefreshToken };
