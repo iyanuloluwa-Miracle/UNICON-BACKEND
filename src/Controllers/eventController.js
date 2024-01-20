@@ -249,9 +249,10 @@ const register = async (req, res) => {
     res.status(500).json({
       success: false,
       data: null,
-      error: err.message,
+      error: error.message,
       message: "Internal Server Error",
-    });
+    }); 
+    console.log(error)
   }
 };
 
