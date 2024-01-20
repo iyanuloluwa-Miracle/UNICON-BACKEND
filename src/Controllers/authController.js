@@ -218,6 +218,9 @@ const signInUser = async (req, res) => {
   }
 };
 
+
+
+
 // Controller for user logout
 const logoutUser = async (req, res) => {
   try {

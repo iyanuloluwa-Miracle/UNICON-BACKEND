@@ -33,29 +33,6 @@ const createEvent = async (req, res) => {
   }
 };
 
-// Get all events
-const getAllEvents = async (req, res) => {
-  try {
-    // Fetch all events from the database
-    const events = await Event.find().populate("creator", "username email");
-
-    res.status(200).json({
-      success: true,
-      data: events,
-      message: "Events retrieved successfully",
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      success: false,
-      data: null,
-      error: err.message,
-      message: "Internal Server Error",
-    });
-  }
-};
-
-// Get a specific event by ID
 const getEventById = async (req, res) => {
   try {
     const eventId = req.params.id;
@@ -89,6 +66,29 @@ const getEventById = async (req, res) => {
     });
   }
 };
+// Get all events
+const getAllEvents = async (req, res) => {
+  try {
+    // Fetch all events from the database
+    const events = await Event.find().populate("creator", "username email");
+
+    res.status(200).json({
+      success: true,
+      data: events,
+      message: "Events retrieved successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      data: null,
+      error: err.message,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+// Get a specific event by ID
 
 // Update a specific event by ID
 const updateEventById = async (req, res) => {
@@ -238,12 +238,16 @@ const register = async (req, res) => {
         success: false,
         error: squadResponse.data?.message,
       });
+    
+    
 
     return res.status(200).json({
       success: true,
       message: "Transaction initiated successfully",
       data: squadResponse.data?.data,
     });
+
+
   } catch (error) {
     res.status(500).json({
       success: false,
