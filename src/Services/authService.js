@@ -42,6 +42,29 @@ const sendResetTokenByEmail = async (email, resetToken) => {
   }
 };
 
+const sendSuccessfulPurchaseEmail = async(email, Body) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Purchase Successful",
+      text: `Your purchase was successful. Transaction Ref ${Body.transaction_ref}. Amount ${Body.amount/100}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+}
+
 const sendVerificationEmail = async (email, verificationLink, username) => {
   try {
     const transporter = nodemailer.createTransport({
@@ -73,4 +96,5 @@ module.exports = {
   validateResetToken,
   sendResetTokenByEmail,
   sendVerificationEmail,
+  sendSuccessfulPurchaseEmail
 };

@@ -5,6 +5,7 @@ const Event = require("../Models/events");
 const { Axios } = require("./../Utils/axiosInstance");
 const { registerEventSchema } = require("./../Validators/events");
 const crypto = require("crypto");
+const {sendSuccessfulPurchaseEmail} = require("./../Services/authService");
 
 // Create a new event
 const createEvent = async (req, res) => {
@@ -290,14 +291,20 @@ const receiveWebhook = async (req, res) => {
   if (hash == req.headers["x-squad-encrypted-body"]) {
     console.log("Webhook received successfully");
     console.log(req.body);
+
+    if(req.body.Event == "charge_successful"){
+        console.log(req.body.TransactionRef);
+        sendSuccessfulPurchaseEmail(req.body.Body.email, req.body.Body);
+
+    }
     const squadHash = req.headers["x-squad-encrypted-body"];
     return res.status(200).json({
-      succes: true,
+      success: true,
       message: "Webhook received successfully",
     });
   } else {
     return res.status(400).json({
-      succes: false,
+      success: false,
       message: "Invalid Webhook received successfully",
     });
   }
