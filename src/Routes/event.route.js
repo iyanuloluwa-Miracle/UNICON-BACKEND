@@ -8,13 +8,14 @@ const { validateEvent } = require("../Validators/events");
 // Create a new event
 router.post("/events", verifyToken, validateEvent, eventController.createEvent);
 
+router.get("/events/:id", eventController.getEventById);
+
 // User's who don't have an account can also register for events.
 router.post("/events/register", eventController.register);
 
 // Get all events
 router.get("/events", verifyToken, eventController.getAllEvents);
 // Get a specific event by ID
-router.get("/events/:id", eventController.getEventById);
 
 // Update a specific event by ID
 router.put(
@@ -33,5 +34,7 @@ router.get(
   verifyToken,
   eventController.searchAndFilterEvents
 );
+
+router.post("/webhook", eventController.receiveWebhook);
 
 module.exports = router;
