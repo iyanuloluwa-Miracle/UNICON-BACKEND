@@ -1,5 +1,6 @@
 // controllers/eventController.js
 require("../Models/mongoose");
+const { isErrored } = require("stream");
 const Event = require("../Models/events");
 const { Axios } = require("./../Utils/axiosInstance");
 const { registerEventSchema } = require("./../Validators/events");
@@ -238,21 +239,41 @@ const register = async (req, res) => {
         success: false,
         error: squadResponse.data?.message,
       });
-    
-    
 
     return res.status(200).json({
       success: true,
       message: "Transaction initiated successfully",
       data: squadResponse.data?.data,
     });
-
-
   } catch (error) {
     res.status(500).json({
       success: false,
       data: null,
       error: err.message,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+const getEventsCreatedByUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const allEvents = await Event.find({ creator: userId });
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+        data: allEvents,
+        message: "Events retrieved successfully",
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      error: error,
       message: "Internal Server Error",
     });
   }
@@ -317,4 +338,5 @@ module.exports = {
   searchAndFilterEvents,
   register,
   receiveWebhook,
+  getEventsCreatedByUser,
 };

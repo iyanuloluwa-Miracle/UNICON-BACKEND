@@ -35,6 +35,12 @@ router.get(
   eventController.searchAndFilterEvents
 );
 
+router.get(
+  "/events/user/:id",
+  verifyToken,
+  eventController.getEventsCreatedByUser
+);
+
 router.post("/webhook", eventController.receiveWebhook);
 // Route to get events by user ID
 router.get('/users/:userId/events', verifyToken, validateEvent, eventController.getEventsByUserId);
