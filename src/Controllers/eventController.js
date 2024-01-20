@@ -281,7 +281,34 @@ const receiveWebhook = async (req, res) => {
   }
 };
 
+
+
+
+// Get events by user ID
+const getEventsByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Find events by user ID
+    const events = await Event.find({ creator: userId }).populate('creator', 'username email');
+
+    res.status(200).json({
+      success: true,
+      data: events,
+      message: 'Events retrieved successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      data: null,
+      error: err.message,
+      message: 'Internal Server Error',
+    });
+  }
+};
 module.exports = {
+  getEventsByUserId,
   createEvent,
   getAllEvents,
   getEventById,

@@ -36,5 +36,8 @@ router.get(
 );
 
 router.post("/webhook", eventController.receiveWebhook);
+// Route to get events by user ID
+router.get('/users/:userId/events', verifyToken, validateEvent, eventController.getEventsByUserId);
+
 
 module.exports = router;
